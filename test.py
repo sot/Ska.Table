@@ -1,4 +1,4 @@
-from ParseTable import parse_table, parse_ascii_table, parse_fits_table, parse_vots_table
+from Ska.Table import read_table, read_ascii_table, read_fits_table, read_vots_table
 import unittest
 from tempfile import mkdtemp
 
@@ -57,17 +57,17 @@ class TestConvert(unittest.TestCase):
             if f.endswith('~') or f.endswith('CVS') or f not in cols:
                 continue
             parseopt = (f in opt and opt[f]) or {}
-            data_array = parse_table(f, **parseopt)
+            data_array = read_table(f, **parseopt)
             self.assertEqual(data_array.dtype.names, cols[f])
             self.assertEqual(len(data_array), nrows[f])
 
     def test2_missing_file(self):
         self.assertRaises(IOError,
-                          parse_table,
+                          read_table,
                           'file_doesnt_exist')
 
     def test3_read_vots_file(self):
-        header, data = parse_vots_table('t/vots_spec.dat')
+        header, data = read_vots_table('t/vots_spec.dat')
         cols = ('id', 'name', 'ra', 'dec', 'flux')
         nrows = 3
         self.assertEqual(data.dtype.names, cols)
@@ -77,7 +77,7 @@ class TestConvert(unittest.TestCase):
 
     def test4_ascii_colnames(self):
         colnames = ('c1','c2','c3', 'c4', 'c5', 'c6')
-        data = parse_ascii_table('t/simple3.txt',
+        data = read_ascii_table('t/simple3.txt',
                                  colnames=colnames)
         self.assertEqual(data.dtype.names, colnames)
 

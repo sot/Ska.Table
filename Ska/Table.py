@@ -120,25 +120,26 @@ def _make_record_array(array, headerrow, datastart, headertype, colnames):
 
     return numpy.rec.fromrecords(data, names=(colnames or header))
 
-def parse_ascii_table(indata, headerrow=1, datastart=None, **opt):
-    """
-    Parse the given ASCII data table (supplied as a list of strings or a file object).  Try
+def read_ascii_table(indata, headerrow=1, datastart=None, **opt):
+    """\
+    Read the given ASCII data table (supplied as a list of strings or a file object).  Try
     each of the delimiters and quotechars in order and stop for the first case gives a
     sensible result.  Returns a numpy record array object of the data table.
-    
-    indata     : File name or iterable file-like or list object
-    delimiters : List of single character delimiters (no RE because csv can't do this)
-    comment    : RE for comment line if matched at beginning (can be a compiled re)
-    quotechars : List of possible quote characters
-    cleanspaces: Clean leading/trailing space chars from input lines and output data fields
-    headerrow  : Row number of header (default=1, None => column names auto-generated)
-    datastart  : Row number of data start (default=None => headerrow+1)
-    headertype : Deprecated, use headerrow and datastart instead.
-                 Can be 'names' => first row consists of column names
-                        'rdb'   => first row consists of column names, second row gets ignored
-                        'none'  => column names auto-generated as col1, col2, ...
-    colnames   : Explicitly set column names from list
-    loud       : Print debug info
+
+    Params::
+      indata     : File name or iterable file-like or list object
+      delimiters : List of single character delimiters (no RE because csv can't do this)
+      comment    : RE for comment line if matched at beginning (can be a compiled re)
+      quotechars : List of possible quote characters
+      cleanspaces: Clean leading/trailing space chars from input lines and output data fields
+      headerrow  : Row number of header (default=1, None => column names auto-generated)
+      datastart  : Row number of data start (default=None => headerrow+1)
+      headertype : Deprecated, use headerrow and datastart instead.
+                   Can be 'names' => first row consists of column names
+                          'rdb'   => first row consists of column names, second row gets ignored
+                          'none'  => column names auto-generated as col1, col2, ...
+      colnames   : Explicitly set column names from list
+      loud       : Print debug info
     """
 
     try:
@@ -252,30 +253,31 @@ def _parse_vots_header(lines, **opt):
         if key == 'description':
             header[key] = '\n'.join(header[key])
         elif len(val) > 0:
-            header[key] = parse_ascii_table(val, **opt)
+            header[key] = read_ascii_table(val, **opt)
 
     return header
 
-def parse_vots_table(indata,
+def read_vots_table(indata,
                      delimiters=[' '],
                      quotechars=["'"],
                      cleanspaces=True,
                      loud=False,
                      ):
-    """
-    Parse the given VOTS (VOTable Simple) data table (supplied as a list of
+    """\
+    Read the given VOTS (VOTable Simple) data table (supplied as a list of
     strings or a file object).  Try each of the delimiters and quotechars in
     order and stop for the first case gives a sensible result.
-    Input:     
-     indata     : File name or iterable file-like or list object
-     delimiters : List of single character delimiters (no RE because csv can't do this)
-     quotechars : List of possible quote characters
-     cleanspaces: Clean leading/trailing space chars from input lines and output data fields
-     loud       : Print debug info
 
-    Returns (header, data):
-     header: dict containing VOTS header elements
-     data: numpy record array object of the data table.
+    Params::
+      indata     : File name or iterable file-like or list object
+      delimiters : List of single character delimiters (no RE because csv can't do this)
+      quotechars : List of possible quote characters
+      cleanspaces: Clean leading/trailing space chars from input lines and output data fields
+      loud       : Print debug info
+
+    Returns (header, data)::
+      header: dict containing VOTS header elements
+      data: numpy record array object of the data table.
     """
     try:
         # Assume the indata parameter is a string file name and see how it goes
@@ -303,7 +305,7 @@ def parse_vots_table(indata,
                                 cleanspaces=cleanspaces,
                                 loud=loud,
                                 )
-    data = parse_ascii_table(datalines,
+    data = read_ascii_table(datalines,
                              headertype='none',
                              delimiters=delimiters,
                              quotechars=quotechars,
@@ -314,7 +316,7 @@ def parse_vots_table(indata,
     return header, data
 
 
-def parse_fits_table(infile, hdunum=1, pyfits=False):
+def read_fits_table(infile, hdunum=1, pyfits=False):
     """Use pyfits to read the first HDU of the FITS table file 'infile'.  Returns a
     record array object which can be accessed either by row or column, e.g. data[2]
     or data.field('col1').
@@ -332,34 +334,27 @@ def parse_fits_table(infile, hdunum=1, pyfits=False):
     out.colnames = out.dtype.names
     return out
     
-def parse_table(file_or_data, **opt):
-    """All-purpose function to guess the format of a data table and parse via the
-    format-specific parsers.
+def read_table(file_or_data, **opt):
+    """\
+    All-purpose function to guess the format of a data table and read via the
+    format-specific parsers.  First tries FITS then ASCII.
 
-    file_or_data : Name of a file or some iterable object with the data
-    <**opt>      : Other options specific to the parse format (see parse_ascii_table
-                   and parse_fits_table)
+    Params::
+      file_or_data : Name of a file or some iterable object with the data
+      <**opt>      : Other options specific to the format (see read_ascii_table
+                   and read_fits_table)
     """
     _sys_stdout = sys.stdout
     try:
         sys.stdout = _NullFile()
-        data = parse_fits_table(file_or_data, **opt)
+        data = read_fits_table(file_or_data, **opt)
         sys.stdout = _sys_stdout
     except (TypeError,IndexError):
         sys.stdout = _sys_stdout
-        data = parse_ascii_table(file_or_data, **opt)
+        data = read_ascii_table(file_or_data, **opt)
     except:
         sys.stdout = _sys_stdout
         raise
 
     return data
 
-def main():
-    from glob import glob
-    for f in glob('*.txt') + glob('*.rdb') + glob('*.fits') + ['nope.fits']:
-        print "File", f
-        data_array = parse_table(f) # , loud=True)
-        print data_array.dtype.names
-
-if __name__ == '__main__':
-    main()

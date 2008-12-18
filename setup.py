@@ -1,10 +1,15 @@
-from setuptools import setup, Extension
-
-setup(name='ParseTable',
+from setuptools import setup
+setup(name='Ska.Table',
       author = 'Tom Aldcroft',
-      description='Parse data tables and return useful rec array objects',
+      description='Read data tables',
       author_email = 'taldcroft@cfa.harvard.edu',
-      py_modules = ['ParseTable'],
-      version='1.4',
-      test_suite = "test",
+      test_suite="test",
+      py_modules = ['Ska.Table'],
+      version='0.01',
+      zip_safe=False,
+      namespace_packages=['Ska'],
+      packages=['Ska'],
+      package_dir={'Ska' : 'Ska'},
+      package_data={}
       )
+
