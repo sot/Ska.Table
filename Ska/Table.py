@@ -358,3 +358,74 @@ def read_table(file_or_data, **opt):
 
     return data
 
+def write_fits_table(outfile, recarray, header={}, clobber=True,
+                     units={}, nulls={}, bscales={}, bzeros={}, disps={}):
+    """Write C{recarray} to a FITS binary table file.
+
+    NOTES:
+    - Set the binary table extension name with C{header['extname']}
+    - Vector column elements should work.  Column elements with 2 or more
+      dimensions have not been tested and may have row-ordering issues.
+
+    @param outfile: output file name
+    @param recarray: input data (numpy record array)
+    @param header: dict of header keyword values
+    @param clobber: overwrite existing file (default True)
+    @param units: dict specifying column unit values
+    @param nulls: dict specifying column null values
+    @param bscales: dict specifying column bscale values
+    @param bzeros: dict specifying column bzero values
+    @param disps: dict specifying column disp values
+    """
+    import pyfits
+    np2fits = dict(b1 = 'L',  bool='L', u1 = 'B', i1 = 'I', i2 = 'I', i4 = 'J',
+                   i8 = 'J', f4 = 'E', f8 = 'D', c8 = 'C', c16 = 'M')
+
+    colnames = recarray.dtype.names
+    coldefs = []
+    dims = {}
+     
+    for colname in colnames:
+        datacol = recarray[colname]
+
+        np_kind = datacol.dtype.kind
+        np_size = str(datacol.dtype.itemsize)
+        np_fmt = np_kind + np_size
+        try:
+            size = datacol[0].size
+            fits_fmt = str(size) + np2fits[np_fmt]
+            if size > 1:
+                dims[colname] = "(%s)" % ",".join(str(x) for x in datacol[0].shape)
+        except KeyError :
+            if np_kind == 'S':
+                fits_fmt = np_size + 'A' 
+            else:
+                raise ValueError('Numpy dtype %s is not supported' % np_fmt)
+
+        coldefs.append(pyfits.Column(name=colname,
+                                     format=fits_fmt,
+                                     array=datacol,
+                                     unit=units.get(colname, None),
+                                     null=nulls.get(colname, None),
+                                     dim=dims.get(colname, None),
+                                     bscale=bscales.get(colname, None),
+                                     bzero=bzeros.get(colname, None),
+                                     disp=disps.get(colname, None)))
+    
+    cols=pyfits.ColDefs(coldefs)
+    hdu0 = pyfits.PrimaryHDU()
+    hdu1 = pyfits.new_table(cols)
+    for hdr, val in header.items():
+        hdu1.header.update(hdr, val)
+    hdulist = pyfits.HDUList([hdu0, hdu1]) 
+
+    # Temporarily redirect stdout to suppress the clobber warning message
+    # then actually write the file
+    try:
+        _sys_stdout = sys.stdout
+        sys.stdout = _NullFile()
+        hdulist.writeto(outfile, clobber=clobber)
+    finally:
+        sys.stdout = _sys_stdout
+
+
