@@ -363,9 +363,9 @@ def write_fits_table(outfile, recarray, header={}, clobber=True,
     """Write C{recarray} to a FITS binary table file.
 
     NOTES:
-    - Set the binary table extension name with C{header['extname']}
-    - Vector column elements should work.  Column elements with 2 or more
-      dimensions have not been tested and may have row-ordering issues.
+      - Set the binary table extension name with C{header['extname']}
+      - Vector column elements should work.  Column elements with 2 or more
+        dimensions have not been tested and may have row-ordering issues.
 
     @param outfile: output file name
     @param recarray: input data (numpy record array)
