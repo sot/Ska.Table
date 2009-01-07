@@ -324,14 +324,33 @@ def read_fits_table(infile, hdunum=1, pyfits=False):
     hdunum : HDU number for desired table (default=1)
     pyfits : Return as a pyfits.NP_pyfits.FITS_rec instead of numpy.rec.recarray.
     """
-    import pyfits as pf
-    hdu = pf.open(infile)[hdunum]
+    import pyfits
+    hdu = pyfits.open(infile)[hdunum]
     if pyfits:
         out = hdu.data
     else:
-        out = numpy.rec.array(hdu.data, dtype=hdu.data.dtype)
+        # Remake array to ensure native datatypes (i.e. match the endianness of
+        # the processor).  Some numpy routines (e.g. searchsorted) don't notice
+        # the dtype endianness specification and can fail.
+        dtypes = []
+        colnames = hdu.data.dtype.names
+        for colname in colnames:
+            col = hdu.data.field(colname)
+            if col.dtype.isnative:
+                dtype = (colname, col.dtype)
+            else:
+                dtype = (colname, col.dtype.type) 
+            if len(col.shape) > 1:
+                dtype = dtype + tuple(col.shape[1:])
+            dtypes.append(dtype)
 
-    out.colnames = out.dtype.names
+        # Now define a new recarray and copy the original data
+        # Note: could use numpy.empty to generate a structured array.
+        out = numpy.recarray(len(hdu.data), dtype=dtypes)
+        for colname in colnames:
+            out[colname][:] = hdu.data.field(colname)
+
+#    out.colnames = out.dtype.names
     return out
     
 def read_table(file_or_data, **opt):
