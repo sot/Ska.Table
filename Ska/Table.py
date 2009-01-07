@@ -324,8 +324,9 @@ def read_fits_table(infile, hdunum=1, pyfits=False):
     hdunum : HDU number for desired table (default=1)
     pyfits : Return as a pyfits.NP_pyfits.FITS_rec instead of numpy.rec.recarray.
     """
-    import pyfits
-    hdu = pyfits.open(infile)[hdunum]
+    # import pyfits as pf so the pyfits keyword is not clobbered
+    import pyfits as pf
+    hdu = pf.open(infile)[hdunum]
     if pyfits:
         out = hdu.data
     else:
@@ -350,7 +351,6 @@ def read_fits_table(infile, hdunum=1, pyfits=False):
         for colname in colnames:
             out[colname][:] = hdu.data.field(colname)
 
-#    out.colnames = out.dtype.names
     return out
     
 def read_table(file_or_data, **opt):
