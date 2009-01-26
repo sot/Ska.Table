@@ -7,7 +7,6 @@ setup(name='Ska.Table',
       py_modules = ['Ska.Table'],
       version='0.03',
       zip_safe=False,
-      namespace_packages=['Ska'],
       packages=['Ska'],
       package_dir={'Ska' : 'Ska'},
       package_data={}

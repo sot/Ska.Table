@@ -121,25 +121,30 @@ def _make_record_array(array, headerrow, datastart, headertype, colnames):
     return numpy.rec.fromrecords(data, names=(colnames or header))
 
 def read_ascii_table(indata, headerrow=1, datastart=None, **opt):
-    """\
+    """
     Read the given ASCII data table (supplied as a list of strings or a file object).  Try
     each of the delimiters and quotechars in order and stop for the first case gives a
     sensible result.  Returns a numpy record array object of the data table.
 
-    Params::
-      indata     : File name or iterable file-like or list object
-      delimiters : List of single character delimiters (no RE because csv can't do this)
-      comment    : RE for comment line if matched at beginning (can be a compiled re)
-      quotechars : List of possible quote characters
-      cleanspaces: Clean leading/trailing space chars from input lines and output data fields
-      headerrow  : Row number of header (default=1, None => column names auto-generated)
-      datastart  : Row number of data start (default=None => headerrow+1)
-      headertype : Deprecated, use headerrow and datastart instead.
-                   Can be 'names' => first row consists of column names
-                          'rdb'   => first row consists of column names, second row gets ignored
-                          'none'  => column names auto-generated as col1, col2, ...
-      colnames   : Explicitly set column names from list
-      loud       : Print debug info
+    Allowed values of the ``headertype`` parameter are:
+     
+    ========  ==============================================================
+    name      first row consists of column names
+    rdb       first row consists of column names, second row gets ignored
+    none      column names auto-generated as col1, col2, ...
+    ========  ==============================================================
+
+    :param indata: File name or iterable file-like or list object
+    :param delimiters: List of single character delimiters (no RE because csv can't do this)
+    :param comment: RE for comment line if matched at beginning (can be a compiled re)
+    :param quotechars: List of possible quote characters
+    :param cleanspaces: Clean leading/trailing space chars from input lines and output data fields
+    :param headerrow: Row number of header (default=1, None => column names auto-generated)
+    :param datastart: Row number of data start (default=None => headerrow+1)
+    :param headertype: Deprecated, use headerrow and datastart instead.
+    :param colnames: Explicitly set column names from list
+    :param loud: Print debug info
+
     """
 
     try:
@@ -263,21 +268,21 @@ def read_vots_table(indata,
                      cleanspaces=True,
                      loud=False,
                      ):
-    """\
+    """
     Read the given VOTS (VOTable Simple) data table (supplied as a list of
     strings or a file object).  Try each of the delimiters and quotechars in
     order and stop for the first case gives a sensible result.
 
-    Params::
-      indata     : File name or iterable file-like or list object
-      delimiters : List of single character delimiters (no RE because csv can't do this)
-      quotechars : List of possible quote characters
-      cleanspaces: Clean leading/trailing space chars from input lines and output data fields
-      loud       : Print debug info
+    :param indata: File name or iterable file-like or list object
+    :param delimiters: List of single character delimiters (no RE because csv can't do this)
+    :param quotechars: List of possible quote characters
+    :param cleanspaces: Clean leading/trailing space chars from input lines and output data fields
+    :param loud: Print debug info
 
-    Returns (header, data)::
-      header: dict containing VOTS header elements
-      data: numpy record array object of the data table.
+    :rtype: (header, data)
+
+    header: dict containing VOTS header elements
+    data: numpy record array object of the data table.
     """
     try:
         # Assume the indata parameter is a string file name and see how it goes
@@ -321,8 +326,9 @@ def read_fits_table(infile, hdunum=1, pyfits=False):
     record array object which can be accessed either by row or column, e.g. data[2]
     or data.field('col1').
 
-    hdunum : HDU number for desired table (default=1)
-    pyfits : Return as a pyfits.NP_pyfits.FITS_rec instead of numpy.rec.recarray.
+    :param hdunum: HDU number for desired table (default=1)
+    :param pyfits: Return as a pyfits.NP_pyfits.FITS_rec instead of numpy.rec.recarray.
+    :rtype: Table object
     """
     # import pyfits as pf so the pyfits keyword is not clobbered
     import pyfits as pf
@@ -354,14 +360,13 @@ def read_fits_table(infile, hdunum=1, pyfits=False):
     return out
     
 def read_table(file_or_data, **opt):
-    """\
+    """
     All-purpose function to guess the format of a data table and read via the
     format-specific parsers.  First tries FITS then ASCII.
 
-    Params::
-      file_or_data : Name of a file or some iterable object with the data
-      <**opt>      : Other options specific to the format (see read_ascii_table
-                   and read_fits_table)
+    :param file_or_data: Name of a file or some iterable object with the data
+    :param opt: Other options specific to the format (see read_ascii_table and read_fits_table)
+    :rtype: Table object
     """
     _sys_stdout = sys.stdout
     try:
@@ -379,22 +384,23 @@ def read_table(file_or_data, **opt):
 
 def write_fits_table(outfile, recarray, header={}, clobber=True,
                      units={}, nulls={}, bscales={}, bzeros={}, disps={}):
-    """Write C{recarray} to a FITS binary table file.
+    """Write ``recarray`` to a FITS binary table file.
 
     NOTES:
-      - Set the binary table extension name with C{header['extname']}
+      - Set the binary table extension name with ``header['extname']``
       - Vector column elements should work.  Column elements with 2 or more
         dimensions have not been tested and may have row-ordering issues.
 
-    @param outfile: output file name
-    @param recarray: input data (numpy record array)
-    @param header: dict of header keyword values
-    @param clobber: overwrite existing file (default True)
-    @param units: dict specifying column unit values
-    @param nulls: dict specifying column null values
-    @param bscales: dict specifying column bscale values
-    @param bzeros: dict specifying column bzero values
-    @param disps: dict specifying column disp values
+    :param outfile: output file name
+    :param recarray: input data (numpy record array)
+    :param header: dict of header keyword values
+    :param clobber: overwrite existing file (default True)
+    :param units: dict specifying column unit values
+    :param nulls: dict specifying column null values
+    :param bscales: dict specifying column bscale values
+    :param bzeros: dict specifying column bzero values
+    :param disps: dict specifying column disp values
+    :rtype: None
     """
     import pyfits
     np2fits = dict(b1 = 'L',  bool='L', u1 = 'B', i1 = 'I', i2 = 'I', i4 = 'J',
