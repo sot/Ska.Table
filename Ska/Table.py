@@ -373,7 +373,7 @@ def read_table(file_or_data, **opt):
         sys.stdout = _NullFile()
         data = read_fits_table(file_or_data, **opt)
         sys.stdout = _sys_stdout
-    except (TypeError,IndexError):
+    except (TypeError,IndexError,IOError):
         sys.stdout = _sys_stdout
         data = read_ascii_table(file_or_data, **opt)
     except:
