@@ -348,7 +348,7 @@ def read_fits_table(infile, hdunum=1, pyfits=False):
             else:
                 dtype = (colname, col.dtype.type) 
             if len(col.shape) > 1:
-                dtype = dtype + tuple(col.shape[1:])
+                dtype = dtype + (tuple(col.shape[1:]),)
             dtypes.append(dtype)
 
         # Now define a new recarray and copy the original data
