@@ -10,11 +10,13 @@ cols["t/ascii_ephin.fits"] = ('TIME', 'TLM_FMT', 'SCP4', 'SCP8', 'SCH8', 'SCE150
 cols["t/short.rdb"]      = ('agasc_id', 'n_noids', 'n_obs')
 cols["t/apostrophe.tab"] = ('agasc_id', 'n_noids', 'n_obs')
 cols["t/apostrophe.rdb"] = ('agasc_id', 'n_noids', 'n_obs')
-cols["t/multi-dim.fits"] = ('RA', 'DEC', 'RA_ERR', 'DEC_ERR', 'X', 'Y', 'X_ERR', 'Y_ERR', 'CELL_X', 'CELL_Y',
-                            'DETSIZE', 'BKGSIZE', 'NPIXSOU', 'NPIXBKG', 'NET_COUNTS', 'NET_COUNTS_ERR',
-                            'BKG_COUNTS', 'BKG_COUNTS_ERR', 'NET_RATE', 'NET_RATE_ERR', 'BKG_RATE', 'BKG_RATE_ERR',
-                            'EXPTIME', 'SNR', 'SHAPE', 'R', 'ROTANG', 'PSFRATIO', 'BLOCK', 'COMPONENT', 'EXPO_RATIO',
-                            'DOUBLE', 'DOUBLE_ID')
+cols["t/multi-dim.fits"] = ('img_loc_i', 'img_loc_j', 'bad_region', 'flat_row0', 'flat_col0', 'dark_row0',
+                            'dark_col0', 'flat_field', 'dark_current', 'fd_y_star', 'fd_z_star',
+                            'fd_y_fid', 'fd_z_fid', 'fd_r_star', 'fd_c_star', 'fd_r_fid', 'fd_c_fid',
+                            'star_comp_coeffs', 'fm_corr_i', 'fm_corr_j', 'cti_corr_i', 'cti_corr_j',
+                            'color_corr_i', 'color_corr_j', 'read_noise', 'gain', 'sub_pix_resp',
+                            'aca_align', 'aca_misalign', 'fts_misalign',
+                            'psf_lib', 'psf_corr', 'mag0', 'cnt_rate_mag0')
 cols["t/simple3.txt"]    = ('obsid', 'redshift', 'X', 'Y', 'object', 'rad')
 cols["t/simple4.txt"]    = ('col1', 'col2', 'col3', 'col4', 'col5', 'col6')
 cols["t/test4.dat"]      = ('zabs1.nh', 'p1.gamma', 'p1.ampl', 'statname', 'statval')
@@ -35,7 +37,7 @@ nrows["t/ascii_ephin.fits"] = 112
 nrows["t/short.rdb"] = 7
 nrows["t/apostrophe.tab"] = 3
 nrows["t/apostrophe.rdb"] = 2
-nrows["t/multi-dim.fits"] = 13
+nrows["t/multi-dim.fits"] = 1
 nrows["t/simple3.txt"] = 2
 nrows["t/simple4.txt"] = 3
 nrows["t/test4.dat"] = 1172
