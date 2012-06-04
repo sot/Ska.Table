@@ -46,6 +46,12 @@ nrows["t/simple.txt"] = 2
 nrows["t/simple2.txt"] = 3
 nrows["t/nls1_stackinfo.dbout"] = 58
 
+rshape = {}
+rshape['t/multi-dim.fits'] = {'dark_current': (64, 64, 8),
+                              'aca_align': (3, 3),
+                              'psf_corr': (1, 1, 8)}
+
+
 opt = {}
 opt['t/short.rdb'] = {'headertype': 'rdb'}
 opt['t/apostrophe.rdb'] = {'headertype': 'rdb'}
@@ -62,6 +68,10 @@ class TestConvert(unittest.TestCase):
             data_array = read_table(f, **parseopt)
             self.assertEqual(data_array.dtype.names, cols[f])
             self.assertEqual(len(data_array), nrows[f])
+            if f in rshape:
+                for ccol, rdims in rshape[f].iteritems():
+                    self.assertEqual(data_array[0][ccol].shape,
+                                     rdims)
 
     def test2_missing_file(self):
         self.assertRaises(IOError,
