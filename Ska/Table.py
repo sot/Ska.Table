@@ -3,6 +3,9 @@ import re
 import numpy
 import csv
 
+__version__ = '0.5.1'
+
+
 class ParseLinesError(ValueError):
     pass
 
