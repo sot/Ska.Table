@@ -1,3 +1,4 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 from Ska.Table import read_table, read_ascii_table, read_fits_table, read_vots_table
 import unittest
 from tempfile import mkdtemp
